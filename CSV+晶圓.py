@@ -1,8 +1,3 @@
-
-# coding: utf-8
-
-# In[43]:
-
 import os
 import csv
 import matplotlib.pyplot as plt
@@ -16,7 +11,9 @@ for f in os.listdir('.'):
 for file_name in files_name:
     first=True
     data_list=[]
+    data_dict={}
     data_list.append(header)
+    
     file=open(file_name,'r')
     for data_str in file:
         data_row=data_str.split()
@@ -25,9 +22,8 @@ for file_name in files_name:
         elif len(data_row)==5:
             for i in range(27):
                 data_row.insert(4,"")
-            data_list.append(data_row)
+            data_dict[(data_row[2],data_row[3])]=data_row
         else:
-            data_list.append(data_row)
             if first:
                 if float(data_row[12])<0.01:
                     file_namec='N40C'
@@ -38,21 +34,14 @@ for file_name in files_name:
                 elif 1<float(data_row[12]):
                     file_namec='125C'
                 first=False
+            data_dict[(data_row[2],data_row[3])]=data_row
+            
+    for each in data_dict:
+        data_list.append(data_dict[each])
+        
     out_name=str(file_name[0:17]+'_'+file_namec+'.csv')
-
     out_file=open(out_name,'w',newline='')
     out_w=csv.writer(out_file)
     out_w.writerows(data_list)
     out_file.close()
     print(out_name)
-
-
-# In[38]:
-
-data_list
-
-
-# In[ ]:
-
-
-

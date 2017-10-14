@@ -1,5 +1,6 @@
 import os
 import csv
+import xlsxwriter
 import matplotlib.pyplot as plt
 
 def form(name):
@@ -66,12 +67,12 @@ for file_name in files_name:
     
     
     #圖表
-    cols=[6,8,10,12]
     form_dict={'6':'ISB_VDD_1.1x (mA)','8':'ISB_CVDD_1.1x (mA)','10':'ISB_VDDPST_1.1x (mA)','12':'ISB_VDD_bin (mA)','20':'Vccmin(mV)@0.5Mhz','31':'Bin'}
     form_data={}
     first=True
-    
+    #讀取並析出資料
     file=open(out_name,'r')
+
     for row in csv.reader(file):
         for each in form_dict:
             if first:
@@ -82,3 +83,50 @@ for file_name in files_name:
             else:
                 form_data[each]=form(form_dict[each])
             form_data[each][int(row[2])+3][7-int(row[3])]=row[int(each)]
+    file.close()
+    
+    form_sum={}
+    form_av={}
+    for each in form_dict:
+        form_sum[str(form_data[each])]=[]
+        for row in range(1,8):
+            for col in range(1,7):
+                try:
+                    form_sum[str(form_data[each])].append(float(form_data[each][row][col]))
+                except:
+                    pass
+        form_sum[str(form_data[each])].sort()
+        form_av[str(form_data[each])]=[float(form_sum[str(form_data[each])][int(len(form_sum[str(form_data[each])])//3)])]
+        form_av[str(form_data[each])].append(float(form_sum[str(form_data[each])][int(len(form_sum[str(form_data[each])])//3*2)]))
+        '''
+        for row in range(8):
+            for col in range(7):
+                if form_data[each] in form_sum:
+                    form_sum[form_data[each]]+=form_data[each][row][col]
+                else:
+                    form_sum[form_data[each]]=form_data[each][row][col]
+        '''
+    #輸出表格
+    #worksheet=['ISB_VDD_1.1x (mA)','ISB_CVDD_1.1x (mA)','ISB_VDDPST_1.1x (mA)','ISB_VDD_bin (mA)','Vccmin(mV)@0.5Mhz','Bin']
+    worksheet={}
+    workbook = xlsxwriter.Workbook(str(file_name[0:17]+'_'+file_namec+'_map.xlsx'))
+    for each in form_dict:
+        worksheet[each] = workbook.add_worksheet(form_dict[each])
+        for row in range(8):
+            for col in range(7):
+                
+                
+                if row == 0 or col ==0:
+                    worksheet[each].write(row,col,form_data[each][row][col])
+                elif form_data[each][row][col] =="":
+                    pass
+                elif float(form_data[each][row][col])>=form_av[str(form_data[each])][1]:
+                    
+                    ItemStyl = workbook.add_format({'bg_color':'#CC0000',})
+                    worksheet[each].write(row,col,form_data[each][row][col],ItemStyl)
+                elif float(form_data[each][row][col])>=form_av[str(form_data[each])][0]:
+                    ItemStyl = workbook.add_format({'bg_color':'#FFFFFF',})
+                    worksheet[each].write(row,col,form_data[each][row][col],ItemStyl)
+                elif float(form_data[each][row][col])<form_av[str(form_data[each])][0]:
+                    ItemStyl = workbook.add_format({'bg_color':'#00DD00',})
+                    worksheet[each].write(row,col,form_data[each][row][col],ItemStyl)

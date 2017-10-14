@@ -1,3 +1,6 @@
+
+# coding: utf-8
+
 import os
 import csv
 import xlsxwriter
@@ -17,7 +20,6 @@ def form(name):
                 name[i].append(7-i)
             else:
                 name[i].append('')
-
     return name
 
 header = ['Lot ID', 'PKG ID', 'X', 'Y', 'VDD(V)', 'VDDPST(V)','ISB_VDD_1.1x (mA)', 'ISB_VDD_1.0x (mA)', 'ISB_CVDD_1.1x (mA)', 'ISB_CVDD_1.0x (mA)',  'ISB_VDDPST_1.1x (mA)', 'ISB_VDDPST_1.0x (mA)','ISB_VDD_bin (mA)','ICC_VDD_1.1x', 'ICC_VDD_1.0x', 'ICC_CVDD_1.1x', 'ICC_CVDD_1.0x',  'ICC_VDDPST_1.1x', 'ICC_VDDPST_1.0x','Vccmin(mV)@5Mhz','Vccmin(mV)@0.5Mhz','Vccmin_CVDD=1.44V','Vccmax_CVDD=1.44V','Vccmin_CVDD=1.53V','Vccmax_CVDD=1.53V','Vccmin_CVDD=1.8V','Vccmax_CVDD=1.8V','Vccmin_CVDD=2.0V','Vccmax_CVDD=2.0V','VSDR(mV)','VDDP(mV)','Bin']
@@ -57,7 +59,7 @@ for file_name in files_name:
     for each in data_dict:
         data_list.append(data_dict[each])
     
-    out_name=str(file_name[0:17]+'_'+file_namec+'.csv')
+    out_name=str(file_name[0:16]+'_'+file_namec+'.csv')
     out_file=open(out_name,'w',newline='')
     out_w=csv.writer(out_file)
     out_w.writerows(data_list)
@@ -98,24 +100,16 @@ for file_name in files_name:
         form_sum[str(form_data[each])].sort()
         form_av[str(form_data[each])]=[float(form_sum[str(form_data[each])][int(len(form_sum[str(form_data[each])])//3)])]
         form_av[str(form_data[each])].append(float(form_sum[str(form_data[each])][int(len(form_sum[str(form_data[each])])//3*2)]))
-        '''
-        for row in range(8):
-            for col in range(7):
-                if form_data[each] in form_sum:
-                    form_sum[form_data[each]]+=form_data[each][row][col]
-                else:
-                    form_sum[form_data[each]]=form_data[each][row][col]
-        '''
+    form_sum[form_data[each]]=form_data[each][row][col]
+    
     #輸出表格
     #worksheet=['ISB_VDD_1.1x (mA)','ISB_CVDD_1.1x (mA)','ISB_VDDPST_1.1x (mA)','ISB_VDD_bin (mA)','Vccmin(mV)@0.5Mhz','Bin']
     worksheet={}
-    workbook = xlsxwriter.Workbook(str(file_name[0:17]+'_'+file_namec+'_map.xlsx'))
+    workbook = xlsxwriter.Workbook(str(file_name[0:16]+'_'+file_namec+'_map.xlsx'))
     for each in form_dict:
         worksheet[each] = workbook.add_worksheet(form_dict[each])
         for row in range(8):
             for col in range(7):
-                
-                
                 if row == 0 or col ==0:
                     worksheet[each].write(row,col,form_data[each][row][col])
                 elif form_data[each][row][col] =="":
@@ -130,3 +124,18 @@ for file_name in files_name:
                 elif float(form_data[each][row][col])<form_av[str(form_data[each])][0]:
                     ItemStyl = workbook.add_format({'bg_color':'#00DD00',})
                     worksheet[each].write(row,col,form_data[each][row][col],ItemStyl)
+        
+        plt.title(str(form_dict[each])+" p-chart") #標題
+        plt.xlabel("Value") #x軸標題
+        plt.ylabel("Pacent(%)") #y軸標題
+        plt.grid(True) #格線
+        x=form_sum[str(form_data[each])]
+        form_sum_lenp=100/len(form_sum[str(form_data[each])])
+        #print(form_sum_lenp)
+        y=[i for i in range(int(form_sum_lenp),101,int(form_sum_lenp))]
+        #print(y)
+        plt.plot(x, y ,marker='o')
+        plt.savefig("C:\\Users\\P8H61-ML\\Documents\\晶圓資料處理\\"+file_name[0:16]+'_'+file_namec+'_'+str(form_dict[each])+".jpg", dpi=120)
+        #plt.show()
+        plt.close()
+

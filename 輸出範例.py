@@ -1,6 +1,5 @@
 
 # coding: utf-8
-
 import os
 import csv
 import xlsxwriter
@@ -100,8 +99,14 @@ for file_name in files_name:
         form_sum[str(form_data[each])].sort()
         form_av[str(form_data[each])]=[float(form_sum[str(form_data[each])][int(len(form_sum[str(form_data[each])])//3)])]
         form_av[str(form_data[each])].append(float(form_sum[str(form_data[each])][int(len(form_sum[str(form_data[each])])//3*2)]))
-    form_sum[form_data[each]]=form_data[each][row][col]
-    
+        '''
+        for row in range(8):
+            for col in range(7):
+                if form_data[each] in form_sum:
+                    form_sum[form_data[each]]+=form_data[each][row][col]
+                else:
+                    form_sum[form_data[each]]=form_data[each][row][col]
+        '''
     #輸出表格
     #worksheet=['ISB_VDD_1.1x (mA)','ISB_CVDD_1.1x (mA)','ISB_VDDPST_1.1x (mA)','ISB_VDD_bin (mA)','Vccmin(mV)@0.5Mhz','Bin']
     worksheet={}
@@ -115,7 +120,6 @@ for file_name in files_name:
                 elif form_data[each][row][col] =="":
                     pass
                 elif float(form_data[each][row][col])>=form_av[str(form_data[each])][1]:
-                    
                     ItemStyl = workbook.add_format({'bg_color':'#CC0000',})
                     worksheet[each].write(row,col,form_data[each][row][col],ItemStyl)
                 elif float(form_data[each][row][col])>=form_av[str(form_data[each])][0]:
@@ -131,7 +135,7 @@ for file_name in files_name:
         plt.grid(True) #格線
         x=form_sum[str(form_data[each])]
         form_sum_lenp=100/len(form_sum[str(form_data[each])])
-        #print(form_sum_lenp)
+        #print(x)
         y=[i for i in range(int(form_sum_lenp),101,int(form_sum_lenp))]
         #print(y)
         plt.plot(x, y ,marker='o')

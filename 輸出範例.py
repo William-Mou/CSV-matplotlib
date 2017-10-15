@@ -28,6 +28,7 @@ for f in os.listdir('.'):
     if os.path.isfile(f) and '.txt' in f:
         files_name.append(f)
 for file_name in files_name:
+    SaveDirectory = os.getcwd()
     first=True
     data_list=[]
     data_dict={}
@@ -111,10 +112,11 @@ for file_name in files_name:
     #worksheet=['ISB_VDD_1.1x (mA)','ISB_CVDD_1.1x (mA)','ISB_VDDPST_1.1x (mA)','ISB_VDD_bin (mA)','Vccmin(mV)@0.5Mhz','Bin']
     worksheet={}
     workbook = xlsxwriter.Workbook(str(file_name[0:16]+'_'+file_namec+'_map.xlsx'))
+    #print(str(file_name[0:16]+'_'+file_namec+'_map.xlsx'))
     for each in form_dict:
         worksheet[each] = workbook.add_worksheet(form_dict[each])
         for row in range(8):
-            for col in range(7):
+            for col in range(7):    
                 if row == 0 or col ==0:
                     worksheet[each].write(row,col,form_data[each][row][col])
                 elif form_data[each][row][col] =="":
@@ -129,6 +131,7 @@ for file_name in files_name:
                     ItemStyl = workbook.add_format({'bg_color':'#00DD00',})
                     worksheet[each].write(row,col,form_data[each][row][col],ItemStyl)
         
+        
         plt.title(str(form_dict[each])+" p-chart") #標題
         plt.xlabel("Value") #x軸標題
         plt.ylabel("Pacent(%)") #y軸標題
@@ -139,7 +142,8 @@ for file_name in files_name:
         y=[i for i in range(int(form_sum_lenp),101,int(form_sum_lenp))]
         #print(y)
         plt.plot(x, y ,marker='o')
-        plt.savefig("C:\\Users\\P8H61-ML\\Documents\\晶圓資料處理\\"+file_name[0:16]+'_'+file_namec+'_'+str(form_dict[each])+".jpg", dpi=120)
+        
+        plt.savefig(SaveDirectory+"\\"+file_name[0:16]+'_'+file_namec+'_'+str(form_dict[each])+".jpg", dpi=120)
         #plt.show()
         plt.close()
-
+    workbook.close()

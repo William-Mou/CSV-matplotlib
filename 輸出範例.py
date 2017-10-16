@@ -1,5 +1,3 @@
-
-# coding: utf-8
 import os
 import csv
 import xlsxwriter
@@ -80,11 +78,12 @@ for file_name in files_name:
             if first:
                 first=False
                 break
+            #若有一張form_dict[each]表格存在form_data，pass；否則創建
             if each in form_data:
                 pass
             else:
                 form_data[each]=form(form_dict[each])
-            form_data[each][int(row[2])+3][7-int(row[3])]=row[int(each)]
+            form_data[each][7-int(row[3])][int(row[2])+3]=row[int(each)]
     file.close()
     
     form_sum={}
@@ -138,8 +137,15 @@ for file_name in files_name:
         plt.grid(True) #格線
         x=form_sum[str(form_data[each])]
         form_sum_lenp=100/len(form_sum[str(form_data[each])])
+        #print(len(x))
         #print(x)
-        y=[i for i in range(int(form_sum_lenp),101,int(form_sum_lenp))]
+        y=[]
+        y_value=0
+        for i in range(len(form_sum[str(form_data[each])])):
+            y_value+=form_sum_lenp
+            y.append(y_value)
+        
+        #print(len(y))
         #print(y)
         plt.plot(x, y ,marker='o')
         

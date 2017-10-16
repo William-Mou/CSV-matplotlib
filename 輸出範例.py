@@ -1,3 +1,5 @@
+
+# coding: utf-8
 import os
 import csv
 import xlsxwriter
@@ -120,13 +122,13 @@ for file_name in files_name:
                     worksheet[each].write(row,col,form_data[each][row][col])
                 elif form_data[each][row][col] =="":
                     pass
-                elif float(form_data[each][row][col])>=form_av[str(form_data[each])][1]:
+                elif float(form_data[each][row][col])>form_av[str(form_data[each])][1]:
                     ItemStyl = workbook.add_format({'bg_color':'#CC0000',})
                     worksheet[each].write(row,col,form_data[each][row][col],ItemStyl)
-                elif float(form_data[each][row][col])>=form_av[str(form_data[each])][0]:
+                elif float(form_data[each][row][col])>form_av[str(form_data[each])][0]:
                     ItemStyl = workbook.add_format({'bg_color':'#FFFFFF',})
                     worksheet[each].write(row,col,form_data[each][row][col],ItemStyl)
-                elif float(form_data[each][row][col])<form_av[str(form_data[each])][0]:
+                elif float(form_data[each][row][col])<=form_av[str(form_data[each])][0]:
                     ItemStyl = workbook.add_format({'bg_color':'#00DD00',})
                     worksheet[each].write(row,col,form_data[each][row][col],ItemStyl)
         
@@ -144,7 +146,7 @@ for file_name in files_name:
         for i in range(len(form_sum[str(form_data[each])])):
             y_value+=form_sum_lenp
             y.append(y_value)
-        
+        #print(len(x))
         #print(len(y))
         #print(y)
         plt.plot(x, y ,marker='o')
